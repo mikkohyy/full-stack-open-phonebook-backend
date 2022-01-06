@@ -1,15 +1,28 @@
+const { request } = require('express')
 const express = require('express')
 const morgan = require('morgan')
 
 const app = express()
 
 app.use(express.json())
-app.use(morgan('tiny'))
+
+morgan.token('sentdata', (request, response) => {
+  requestBody = JSON.stringify(request.body)
+  return requestBody
+})
+
+app.use(morgan('tiny', {
+  skip: (request) => request.method === 'POST'
+}))
+
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :sentdata', {
+  skip: (request) => request.method !== 'POST'
+}))
 
 let persons = [
   { 
-    "id": 1,
     "name": "Arto Hellas", 
+    "id": 1,
     "number": "040-123456"
   },
   { 
@@ -41,8 +54,6 @@ const nameExistsInPhonebook = (name) => {
 
 app.post('/api/persons', (request, response) => {
   const body = request.body
-
-  console.log(body)
 
   if (!body.name && !body.number) {
     return response.status(400).json({
