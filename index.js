@@ -1,5 +1,8 @@
+const { json } = require('express')
 const express = require('express')
 const app = express()
+
+app.use(express.json())
 
 let persons = [
   { 
@@ -23,6 +26,18 @@ let persons = [
     "number": "39-23-6423122"
   }
 ]
+
+const createId = () => {
+  const newId = Math.floor(Math.random() * 10000)
+  return newId
+}
+
+app.post('/api/persons', (request, response) => {
+  const body = request.body
+  const newPerson = {...body, "id": createId()}
+  persons = persons.concat(newPerson)
+  response.json(newPerson)
+})
 
 app.get('/info', (request, response) => {
   const nOfPersons = persons.length
