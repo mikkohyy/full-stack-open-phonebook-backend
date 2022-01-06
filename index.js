@@ -32,8 +32,34 @@ const createId = () => {
   return newId
 }
 
+const nameExistsInPhonebook = (name) => {
+  const nameExists = persons.some(person => person.name === name)  
+  return nameExists
+}
+
 app.post('/api/persons', (request, response) => {
   const body = request.body
+
+  if (!body.name && !body.number) {
+    return response.status(400).json({
+      error: 'name and number are missing'
+    })
+  } else if (!body.name) {
+    return response.status(400).json({
+      error: 'name is missing'
+    })
+  } else if (!body.number) {
+    return response.status(400).json({
+      error: 'number is missing'
+    })
+  }
+
+  if (nameExistsInPhonebook(body.name)) {
+    return response.status(403).json({
+      error: 'name already exists in the phonebook'
+    })
+  }
+
   const newPerson = {...body, "id": createId()}
   persons = persons.concat(newPerson)
   response.json(newPerson)
