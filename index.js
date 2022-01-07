@@ -26,11 +26,6 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :s
 
 let persons = []
 
-const createId = () => {
-  const newId = Math.floor(Math.random() * 10000)
-  return newId
-}
-
 const nameExistsInPhonebook = (name) => {
   const nameExists = persons.some(person => person.name === name)  
   return nameExists
@@ -59,9 +54,14 @@ app.post('/api/persons', (request, response) => {
     })
   }
 
-  const newPerson = {...body, "id": createId()}
-  persons = persons.concat(newPerson)
-  response.json(newPerson)
+  const newPerson = new Person({
+    name: body.name,
+    number: body.number
+  })
+
+  newPerson.save().then(result => {
+    response.json(newPerson)
+  })
 })
 
 app.get('/info', (request, response) => {
