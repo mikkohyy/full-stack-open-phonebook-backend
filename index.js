@@ -59,9 +59,11 @@ app.post('/api/persons', (request, response) => {
     number: body.number
   })
 
-  newPerson.save().then(result => {
-    response.json(newPerson)
-  })
+  newPerson.save()
+    .then(result => {
+      response.json(newPerson)
+    })
+    .catch(error => next(error))
 })
 
 app.get('/info', (request, response) => {
@@ -90,7 +92,7 @@ app.get('/api/persons/:id', (request, response) => {
     return response.json(person)
   } else {
     response.status(404).end()
-  }  
+  }
 })
 
 app.get('/', (request, response) => {
@@ -98,10 +100,18 @@ app.get('/', (request, response) => {
 })
 
 app.delete('/api/persons/:id', (request, response) => {
-  const id = Number(request.params.id)
-  persons = persons.filter(person => person.id !== id)
-  response.status(204).end()
+  const id = request.params.id
+  Person.findByIdAndRemove(id)
+    .then(result => {
+      response.status(204).end()
+    })
+    .catch(error => next(error))
 })
+
+const errorHandler = (error, request, response, next) => {
+  console.log(error)
+  next(error)
+}
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
