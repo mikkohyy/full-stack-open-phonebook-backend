@@ -2,4 +2,4 @@
 
 App in heroku: [https://evening-fortress-74308.herokuapp.com/](https://evening-fortress-74308.herokuapp.com/)
 
-Persons api: [https://evening-fortress-74308.herokuapp.com/api/persons](https://evening-fortress-74308.herokuapp.com/api/persons)
+App's persons api: [https://evening-fortress-74308.herokuapp.com/api/persons](https://evening-fortress-74308.herokuapp.com/api/persons)
