@@ -27,20 +27,6 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :s
 app.post('/api/persons', (request, response, next) => {
   const body = request.body
 
-  if (!body.name && !body.number) {
-    return response.status(400).json({
-      error: 'name and number are missing'
-    })
-  } else if (!body.name) {
-    return response.status(400).json({
-      error: 'name is missing'
-    })
-  } else if (!body.number) {
-    return response.status(400).json({
-      error: 'number is missing'
-    })
-  }
-
   const newPerson = new Person({
     name: body.name,
     number: body.number
@@ -75,6 +61,7 @@ app.get('/api/persons', (request, response) => {
   Person.find({}).then(persons => {
     response.json(persons)
   })
+  .catch(error => next(error))
 })
 
 app.get('/api/persons/:id', (request, response, next) => {
@@ -113,7 +100,7 @@ app.put('/api/persons/:id', (request, response, next) => {
     number: body.number
   }
 
-  Person.findByIdAndUpdate(id, person, { new: true })
+  Person.findOneAndUpdate({ _id: id }, person, { new: true, runValidators: true })
     .then(updatedPerson => {
       response.json(updatedPerson)
     })
@@ -121,10 +108,12 @@ app.put('/api/persons/:id', (request, response, next) => {
 })
 
 const errorHandler = (error, request, response, next) => {
-  console.error(error)
+  console.error(request.body)
 
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).send({ error: error.message })
   }
 
   next(error)
